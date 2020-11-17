@@ -5,6 +5,7 @@
 #include <fstream>
 #include <iomanip>
 #include <cstring>
+#include <time.h>
 using namespace std;
 
 
@@ -84,7 +85,7 @@ Pos clean_back (Ground &gnd, Pos cur_pos, int &decreasing_life) {
         next_pos.x = x + 1;
         next_pos.y = y;
         next_pos.visited = 1;
-        cout << "line 85" << endl;
+        // cout << "line 85" << endl;
     } else if ( gnd.step[x][y + 1] == decreasing_life - 1)  {           // east, need to be cleaned
         next_pos.x = x;
         next_pos.y = y + 1;
@@ -99,7 +100,7 @@ Pos clean_back (Ground &gnd, Pos cur_pos, int &decreasing_life) {
     return next_pos;
 } 
 
-void Ground_Path(Ground &gnd) {
+void Ground_Path(Ground &gnd, ostream& file_out) {
     Pos cur_pos, next_pos;                                // current position, next_position
     stack<Pos> path_stack;                                // path
     stack<Pos> path_back_stack;
@@ -115,19 +116,19 @@ void Ground_Path(Ground &gnd) {
     int search_undone = 0;
     
     do {
-        cout << "line 123" << endl;
+        // cout << "line 123" << endl;
         
         if(NO_battery) {
             // check near number 
             while(!path_stack.empty()) {
                 path_stack.pop();
-                cout << "pathback 129" << endl;
+                // cout << "pathback 129" << endl;
             }
             path_stack.push(gnd.start);
             
-            cout << "line 134" << endl;
+            // cout << "line 134" << endl;
             do {
-                cout << "in the do loop" << endl;
+                // cout << "in the do loop" << endl;
                 next_pos = clean_back(gnd, cur_pos, decreasing_life);                           // must find it
                 
                 if ( cur_pos.x + 1 != gnd.row   && gnd.ground[cur_pos.x + 1][cur_pos.y] == '0') {                    // south, need to be clean
@@ -145,22 +146,21 @@ void Ground_Path(Ground &gnd) {
                 if (next_pos.visited != -1) {
                     if(from_here) {
                         tmp_stack.push(cur_pos);
-                        cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
+                        // cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
                     }
                     whole_path_queue.push(cur_pos);
                     if (gnd.ground[cur_pos.x][cur_pos.y] == '0') gnd.ground[cur_pos.x][cur_pos.y] = 'A';         // have already gone
                     if (do_nothing) gnd.ground[cur_pos.x][cur_pos.y] = 'E';
                     
                     
-
-
                     cur_pos = next_pos;
-                    cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
+                    // cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
                     decreasing_life--;
                     SUM_STEP++;
                     if (cur_pos.x == gnd.start.x && cur_pos.y == gnd.start.y) {
                         decreasing_life = gnd.life;
                         NO_battery = 0;
+                        whole_path_queue.push(cur_pos);
                     }
                                                          // sum step
                 } 
@@ -168,16 +168,16 @@ void Ground_Path(Ground &gnd) {
             } while (decreasing_life != gnd.life)  ;                                                         // back to the recharge pt
             
             
-            cout << "line 168" << endl;
+            // cout << "line 168" << endl;
             while (!tmp_stack.empty()) {                                   // pop the best road, back to R pt to recharge
                 cur_pos = tmp_stack.top();
-                cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
+                // cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
                 whole_path_queue.push(cur_pos);
                 path_stack.push(cur_pos);
                 tmp_stack.pop();
                 SUM_STEP++;
                 decreasing_life--;
-                cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
+                // cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
             }
                                                             // two while loop end, cur_pos is where the last time need to charge location
         }
@@ -186,8 +186,6 @@ void Ground_Path(Ground &gnd) {
         
         next_pos = clean(gnd, cur_pos);  
                                                        // normal clean
-        
-
         if (next_pos.visited != -1) {
             path_stack.push(cur_pos);
             whole_path_queue.push(cur_pos);
@@ -224,7 +222,7 @@ void Ground_Path(Ground &gnd) {
     for (int i = 0; i < gnd.row; i++) {
         for (int j = 0; j < gnd.col; j++ ) {
             if (gnd.ground[i][j] == '0') {
-                cout << "unfound i j = " << i << " " << j << endl;
+                // cout << "unfound i j = " << i << " " << j << endl;
                 cur_pos.x = i;
                 cur_pos.y = j;
                 search_undone = 1;
@@ -232,9 +230,9 @@ void Ground_Path(Ground &gnd) {
             }
             if (search_undone == 1 ) {
                 do {
-                    cout << "line 233" << endl;
+                    // cout << "line 233" << endl;
                     
-                    cout << "decreasing_life = " << decreasing_life << endl;
+                    // cout << "decreasing_life = " << decreasing_life << endl;
                     next_pos = clean_back(gnd, cur_pos, decreasing_life);
 
                     if ( cur_pos.x + 1 != gnd.row   && gnd.ground[cur_pos.x + 1][cur_pos.y] == '0') {                    // south, need to be clean
@@ -252,19 +250,18 @@ void Ground_Path(Ground &gnd) {
                     if (next_pos.visited != -1) {
                         if(from_here) {
                             tmp_stack.push(cur_pos);
-                            cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
+                            // cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
                         }
                         whole_path_queue.push(cur_pos);
                         if (gnd.ground[cur_pos.x][cur_pos.y] == '0') gnd.ground[cur_pos.x][cur_pos.y] = 'A';         // have already gone
                         if (do_nothing) gnd.ground[cur_pos.x][cur_pos.y] = 'E';
                                 
                         cur_pos = next_pos;
-                        cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
+                        // cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
                         decreasing_life--;
                         SUM_STEP++;
                         if (cur_pos.x == gnd.start.x && cur_pos.y == gnd.start.y) {
                             decreasing_life = gnd.life;
-                        
                             search_undone = 0;
                         }
                                                                     // sum step
@@ -272,16 +269,16 @@ void Ground_Path(Ground &gnd) {
 
                 } while(search_undone == 1);
 
-                cout << "line 272" << endl;
+                // cout << "line 272" << endl;
                 while (!tmp_stack.empty()) {                                   // pop the best road, back to R pt to recharge
                 cur_pos = tmp_stack.top();
-                cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
+                // cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
                 whole_path_queue.push(cur_pos);
                 path_stack.push(cur_pos);
                 tmp_stack.pop();
                 SUM_STEP++;
                 decreasing_life--;
-                cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
+                // cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
             }
 
                 do {      
@@ -289,14 +286,13 @@ void Ground_Path(Ground &gnd) {
                         // check near number 
                         while(!path_stack.empty()) {
                             path_stack.pop();
-                            cout << "pathback 129" << endl;
+                            // cout << "pathback 129" << endl;
                         }
                         path_stack.push(gnd.start);
                         
-
-                        cout << "line 134" << endl;
+                        // cout << "line 134" << endl;
                         do {
-                            cout << "in the do loop" << endl;
+                            // cout << "in the do loop" << endl;
                             next_pos = clean_back(gnd, cur_pos, decreasing_life);                           // must find it
                             
                             if ( cur_pos.x + 1 != gnd.row   && gnd.ground[cur_pos.x + 1][cur_pos.y] == '0') {                    // south, need to be clean
@@ -314,14 +310,14 @@ void Ground_Path(Ground &gnd) {
                             if (next_pos.visited != -1) {
                                 if(from_here) {
                                     tmp_stack.push(cur_pos);
-                                    cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
+                                    // cout << "in tmp _from_here " << cur_pos.x <<  " " << cur_pos.y << endl;
                                 }
                                 whole_path_queue.push(cur_pos);
                                 if (gnd.ground[cur_pos.x][cur_pos.y] == '0') gnd.ground[cur_pos.x][cur_pos.y] = 'A';         // have already gone
                                 if (do_nothing) gnd.ground[cur_pos.x][cur_pos.y] = 'E';
                                 
                                 cur_pos = next_pos;
-                                cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
+                                // cout << "cur_pos.x and cur_pos.y = " << cur_pos.x << " " << cur_pos.y << endl;
                                 decreasing_life--;
                                 SUM_STEP++;
                                 if (cur_pos.x == gnd.start.x && cur_pos.y == gnd.start.y) {
@@ -333,16 +329,16 @@ void Ground_Path(Ground &gnd) {
                             
                         } while (decreasing_life != gnd.life)  ;                                                         // back to the recharge pt
                         
-                        cout << "line 168" << endl;
+                       
                         while (!tmp_stack.empty()) {                                   // pop the best road, back to R pt to recharge
                             cur_pos = tmp_stack.top();
-                            cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
+                            // cout << "tmp_stack top the cur_pos" << cur_pos.x << " " << cur_pos.y << endl;
                             whole_path_queue.push(cur_pos);
                             path_stack.push(cur_pos);
                             tmp_stack.pop();
                             SUM_STEP++;
                             decreasing_life--;
-                            cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
+                            // cout << "when in tmp_stack" << cur_pos.x << " " << cur_pos.y << endl;
                         }
                                                                         // two while loop end, cur_pos is where the last time need to charge location
                     }
@@ -390,9 +386,11 @@ void Ground_Path(Ground &gnd) {
     while (!whole_path_queue.empty()) {
         cur_pos = whole_path_queue.front();
         whole_path_queue.pop();
-        cout << setw(3) << cur_pos.x << setw(3) << cur_pos.y << endl;
+        file_out << setw(3) << cur_pos.x << setw(3) << cur_pos.y << endl;
     }
-      
+    
+
+
      
 }
 
@@ -450,6 +448,22 @@ void set_route(Ground &gnd, Pos now) {
     }
 }
 
+void print(ostream& file_out, Ground &gnd) {          // ostream&
+    
+    char *arr;
+    arr = new char[2 * gnd.col + 1];                        // to input '1', '0', ' '
+    
+    for (int i = 0; i < gnd.row; ++i) {                     // the top 4 row need no assign, they are not the playground
+        for (int j = 0; j < gnd.col; ++j) {
+            						// if space[i][j] = 1, i.e has element 1
+                arr[2*j] = gnd.ground[i][j];                         // when put 1, add another element ' ' into it
+                arr[2*j + 1] = ' ';
+            
+        }
+        arr[2 * gnd.col] = '\n';
+        file_out.write(arr, 2 * gnd.col + 1);               // write(memory_block, size);
+    }													// the way find in the internet
+}
 
 int main (int argc, char **argv) {
     Ground G;
@@ -502,9 +516,9 @@ int main (int argc, char **argv) {
 
     set_route(G, G.start);
     
- 
-    Ground_Path(G);
-
+    cout << G.start.x << " start pt" << G.start.y << endl; 
+    Ground_Path(G, file_out);
+    /*
     for (int i = 0; i < G.row; ++i) {                                         // set all value 0
         for (int j = 0; j < G.col; ++j) {
         
@@ -516,7 +530,7 @@ int main (int argc, char **argv) {
         }   
         cout << endl;         
     }    
-
+    */
 
     /*
     for (int i = 0; i < G.row; ++i) {                                         // output all step from R pt 
@@ -546,9 +560,9 @@ int main (int argc, char **argv) {
         cout << endl;
     }
 */
-    cout << "line356" << endl;
+    print(file_out, G);
     file_in.close();
-    
+    cout << (double)clock() / CLOCKS_PER_SEC << "S";
     return 0;
 }
 
