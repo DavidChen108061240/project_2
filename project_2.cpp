@@ -44,11 +44,11 @@ Pos clean (Ground &gnd, Pos cur_pos) {
         next_pos.y = y;
         next_pos.visited = 1;
         
-    } else if ((gnd.ground[x][y - 1] == '0') && y != 0) {              // west, need to be clean
+    } else if ( y != 0 && (gnd.ground[x][y - 1] == '0') ) {              // west, need to be clean
         next_pos.x = x;
         next_pos.y = y - 1;
         next_pos.visited = 1;
-    } else if ((gnd.ground[x - 1][y] == '0') && x != 0) {              // north, need to be clean
+    } else if ( x != 0 && (gnd.ground[x - 1][y] == '0') ) {              // north, need to be clean
         next_pos.x = x - 1;
         next_pos.y = y;
         next_pos.visited = 1;
@@ -122,11 +122,11 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
             // check near number 
             while(!path_stack.empty()) {
                 path_stack.pop();
-                // cout << "pathback 129" << endl;
+                 //cout << "pathback 129" << endl;
             }
             path_stack.push(gnd.start);
             
-            // cout << "line 134" << endl;
+             //cout << "line 134" << endl;
             do {
                 // cout << "in the do loop" << endl;
                 next_pos = clean_back(gnd, cur_pos, decreasing_life);                           // must find it
@@ -135,9 +135,9 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
                     from_here = 1;
                 } else if (cur_pos.y + 1 != gnd.col  && gnd.ground[cur_pos.x][cur_pos.y + 1] == '0' )  {           // east, need to be cleaned
                     from_here = 1;    
-                } else if (gnd.ground[cur_pos.x - 1][cur_pos.y] == '0' && cur_pos.x != 0) {                       // north, need to be clean
+                } else if (cur_pos.x != 0 && gnd.ground[cur_pos.x - 1][cur_pos.y] == '0' ) {                       // north, need to be clean
                     from_here = 1;    
-                } else if (gnd.ground[cur_pos.x][cur_pos.y - 1] == '0' && cur_pos.y != 0) {                       // west, need to be clean
+                } else if (cur_pos.y != 0 && gnd.ground[cur_pos.x][cur_pos.y - 1] == '0' ) {                       // west, need to be clean
                     from_here = 1;
                 } else {
                     do_nothing  = 1;
@@ -161,6 +161,8 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
                         decreasing_life = gnd.life;
                         NO_battery = 0;
                         whole_path_queue.push(cur_pos);
+                        // file_out << "get charge 164 " << endl;
+                        // file_out << "now pos is " << cur_pos.x << " !!! " << cur_pos.y << endl;
                     }
                                                          // sum step
                 } 
@@ -198,6 +200,7 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
             
             if(decreasing_life == gnd.step[cur_pos.x][cur_pos.y])  {
                 NO_battery = 1;                             /////// go back R
+                // file_out  << "get charged now , fully !" << endl;
             }        
             
         } else {                                            // four way can not go 
@@ -288,7 +291,7 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
                             path_stack.pop();
                             // cout << "pathback 129" << endl;
                         }
-                        path_stack.push(gnd.start);
+                        //path_stack.push(gnd.start);
                         
                         // cout << "line 134" << endl;
                         do {
@@ -299,9 +302,9 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
                                 from_here = 1;
                             } else if (cur_pos.y + 1 != gnd.col  && gnd.ground[cur_pos.x][cur_pos.y + 1] == '0' )  {           // east, need to be cleaned
                                 from_here = 1;    
-                            } else if (gnd.ground[cur_pos.x - 1][cur_pos.y] == '0' && cur_pos.x != 0) {                       // north, need to be clean
+                            } else if ( cur_pos.x != 0 && gnd.ground[cur_pos.x - 1][cur_pos.y] == '0' ) {                       // north, need to be clean
                                 from_here = 1;    
-                            } else if (gnd.ground[cur_pos.x][cur_pos.y - 1] == '0' && cur_pos.y != 0) {                       // west, need to be clean
+                            } else if ( cur_pos.y != 0 && gnd.ground[cur_pos.x][cur_pos.y - 1] == '0' ) {                       // west, need to be clean
                                 from_here = 1;
                             } else {
                                 do_nothing  = 1;
@@ -381,14 +384,14 @@ void Ground_Path(Ground &gnd, ostream& file_out) {
     }
     
     
-    cout << "whole step is " << SUM_STEP << endl;
+    cout << "whole step is " << SUM_STEP + 1 << endl;
     
     while (!whole_path_queue.empty()) {
         cur_pos = whole_path_queue.front();
         whole_path_queue.pop();
         file_out << setw(3) << cur_pos.x << setw(3) << cur_pos.y << endl;
     }
-    
+    file_out << setw(3) << gnd.start.x << setw(3) << gnd.start.y << endl;
 
 
      
@@ -518,6 +521,7 @@ int main (int argc, char **argv) {
     
     cout << G.start.x << " start pt" << G.start.y << endl; 
     Ground_Path(G, file_out);
+    cout << "line 521 " << endl;
     /*
     for (int i = 0; i < G.row; ++i) {                                         // set all value 0
         for (int j = 0; j < G.col; ++j) {
@@ -560,7 +564,7 @@ int main (int argc, char **argv) {
         cout << endl;
     }
 */
-    print(file_out, G);
+    //print(file_out, G);
     file_in.close();
     cout << (double)clock() / CLOCKS_PER_SEC << "S";
     return 0;
