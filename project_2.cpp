@@ -607,7 +607,7 @@ int main (int argc, char **argv) {
     ofstream file_out;                                  // ostream
 
     file_in.open(argv[1], ios::in);                     // open argv[1]
-    file_out.open("108061240_proj1.final", ios::out | ios::trunc);  
+    file_out.open("final.path", ios::out | ios::trunc);  
                                                         // open a file and clean data and rewrite it, if this file doesn't exist, new a file
     if (!file_in.is_open())                             // check if input file open sucessfully
     {
